@@ -16,7 +16,7 @@ Add a reference to AzureTableStorageService.dll to your project.
 Define an entity that inherits from TableEntityBase and add your custom fields.
 
 ```c#
-public class TeeTimes : AzureTableStorageService.Models.TableEntityBase
+public class ToDos : AzureTableStorageService.Models.TableEntityBase
 {
   public ToDos() : base()
   {
