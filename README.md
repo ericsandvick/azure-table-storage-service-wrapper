@@ -27,13 +27,18 @@ public class ToDos : AzureTableStorageService.Models.TableEntityBase
   public string? Title { get; set; }
 }
 ```
-
 ### Initialize an instance of AzureTableStorageService for the entity
 
 ```c#
 AzureTableStorageService<ToDos> azureTableStorageService = 
   new AzureTableStorageService<ToDos>(connectionString: "<Azure Storage Account Connection String>",
     tableName: nameof(ToDos));
+```
+
+### Create the table in Azure Storage
+
+```c#
+Response<TableItem> result = azureTableStorageService.CreateTable();
 ```
 
 ### Add a new entity
