@@ -1,4 +1,6 @@
-﻿using Azure.Data.Tables;
+﻿using Azure;
+using Azure.Data.Tables;
+using Azure.Data.Tables.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -6,13 +8,24 @@ namespace AzureTableStorageService.Services
 {
     public class AzureTableStorageService<T> : IAzureTableStorageService<T> where T : class, ITableEntity, new()
     {
+        private readonly TableServiceClient _tableServiceClient;
         private readonly TableClient _tableClient;
 
         public AzureTableStorageService(string connectionString, string tableName) : this(new TableServiceClient(connectionString), tableName) { }
 
         public AzureTableStorageService(TableServiceClient tableServiceClient, string tableName)
         {
+            _tableServiceClient = tableServiceClient;
             _tableClient = tableServiceClient.GetTableClient(tableName);
+        }
+
+        /// <summary>
+        /// Creates the target table if it does not exist.
+        /// </summary>
+        /// <returns></returns>
+        public Response<TableItem> CreateTable()
+        {
+            return _tableServiceClient.CreateTableIfNotExists(_tableClient.Name);
         }
 
         /// <summary>
@@ -42,9 +55,17 @@ namespace AzureTableStorageService.Services
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public IEnumerable<T> GetEntities(string filter = null)
+        public List<T> GetEntities(string filter = null)
         {
-            return _tableClient.Query<T>(filter);
+            var pageable = _tableClient.Query<T>(filter);
+
+            var entityList = new List<T>();
+            foreach (var entity in pageable)
+            {
+                entityList.Add(entity);
+            }
+
+            return entityList;
         }
 
         /// <summary>
